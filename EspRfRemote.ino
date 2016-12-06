@@ -22,17 +22,17 @@ ESP8266WebServer server(80);
 
 void handleRoot() {
   String message = "<html><head></head><body style='font-family: sans-serif; font-size: 12px'>";
-  message += "Send RF code:<br>";
+  message += "Set up the RF code and press on/off to generate and call the corrensponding url:<br><br>";
   message += "<form id='data' action='/rf' target='response'>";
   message += "Output pin D<input name='D' type='number' value='6' style='width:40px' min='0' max='8'> ";
   message += "pulse<input name='t' type='number' value='200' style='width:60px' min='0' max='1000'>µs ";
   message += "ID<input name='id' type='number' value='28013' style='width:80px' min='0' max='1048575'> ";
   message += "<input name='on' type='hidden' value='1'>";
   message += "channel<input name='channel' type='number' value='0' style='width:40px' min='0' max='2'> ";
-  message += "<script>function send(on){ document.getElementsByName('on')[0].value = on; document.getElementById('data').submit() }</script>";
+  message += "<script>function send(on){ document.getElementsByName('on')[0].value = on; document.getElementById('data').submit();}; function loaded(){ var a = document.getElementById('target'); a.innerHTML = a.href = document.getElementById('response').contentWindow.location; };</script>";
   message += "<input type='button' value='on' onclick='send(1)'><input type='button' value='off' onclick='send(0)'>";
   message += "</form><br>";
-  message += "<iframe name='response' style='height: 40px; border: 0'></iframe><br><br>";
+  message += "<iframe id='response' name='response' style='display:none' onload='loaded()'></iframe>URL constucted and called: <a href='#' id='target'>...</a><br><br>";
   message += "have fun -<a href='http://youtube.com/bitlunislab'>bitluni</a></body></html>";
   server.send(200, "text/html", message);
 }
@@ -69,17 +69,15 @@ void handleRf()
 	int id = getArgValue("id");
 	int ch = getArgValue("channel");
 	int on = getArgValue("on");
-	String out = "http://";
-	out += WiFi.localIP();
-	out += "/rf?D=";
+	String out = "rf D";
 	out += pin;
-	out += "&t=";
+	out += " ";
 	out += t;
-	out += "&id=";
+	out += " ";
 	out += id;
-	out += "&channel=";
+	out += " ";
 	out += ch;
-	out += "&on=";
+	out += " ";
 	out += on;
 	pinMode(pinNumbers[pin], OUTPUT);
 	for(int i = 0; i < 5; i++)
